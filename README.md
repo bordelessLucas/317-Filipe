@@ -1,50 +1,77 @@
-# Welcome to your Expo app 👋
+# CONNECT - Expo App
 
-This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
+Aplicativo mobile CONNECT convertido para Expo/React Native.
 
-## Get started
+## 🚀 Como Rodar
 
-1. Install dependencies
+### Pré-requisitos
+- Node.js instalado
+- Expo Go app no celular ([Android](https://play.google.com/store/apps/details?id=host.exp.exponent) | [iOS](https://apps.apple.com/app/expo-go/id982107779))
 
-   ```bash
-   npm install
-   ```
-
-2. Start the app
-
-   ```bash
-   npx expo start
-   ```
-
-In the output, you'll find options to open the app in a
-
-- [development build](https://docs.expo.dev/develop/development-builds/introduction/)
-- [Android emulator](https://docs.expo.dev/workflow/android-studio-emulator/)
-- [iOS simulator](https://docs.expo.dev/workflow/ios-simulator/)
-- [Expo Go](https://expo.dev/go), a limited sandbox for trying out app development with Expo
-
-You can start developing by editing the files inside the **app** directory. This project uses [file-based routing](https://docs.expo.dev/router/introduction).
-
-## Get a fresh project
-
-When you're ready, run:
+### Instalação
 
 ```bash
-npm run reset-project
+npm install
 ```
 
-This command will move the starter code to the **app-example** directory and create a blank **app** directory where you can start developing.
+### Iniciar o Servidor
 
-## Learn more
+```bash
+npm start
+```
 
-To learn more about developing your project with Expo, look at the following resources:
+Ou comandos específicos:
 
-- [Expo documentation](https://docs.expo.dev/): Learn fundamentals, or go into advanced topics with our [guides](https://docs.expo.dev/guides).
-- [Learn Expo tutorial](https://docs.expo.dev/tutorial/introduction/): Follow a step-by-step tutorial where you'll create a project that runs on Android, iOS, and the web.
+```bash
+npm run android   # Abre no Android
+npm run ios      # Abre no iOS (Mac only)
+npm run web      # Abre no navegador
+```
 
-## Join the community
+### Testar no Celular
 
-Join our community of developers creating universal apps.
+1. Execute `npm start`
+2. Abra o app **Expo Go** no seu celular
+3. Escaneie o QR Code que aparece no terminal
+4. O app será carregado no seu celular!
 
-- [Expo on GitHub](https://github.com/expo/expo): View our open source platform and contribute.
-- [Discord community](https://chat.expo.dev): Chat with Expo users and ask questions.
+## 📱 Estrutura
+
+```
+app/
+├── _layout.tsx          # Layout raiz
+├── (tabs)/              # Navegação por tabs
+│   ├── _layout.tsx      # Layout das tabs
+│   ├── index.tsx        # Feed
+│   ├── communities.tsx  # Comunidades
+│   ├── events.tsx       # Eventos
+│   └── profile.tsx      # Perfil
+└── login.tsx           # Tela de login
+```
+
+## 🛠️ Tecnologias
+
+- **Expo** - Framework React Native
+- **Expo Router** - Navegação baseada em arquivos
+- **React Native** - Framework mobile
+- **TypeScript** - Tipagem estática
+- **Firebase** - Backend (configuração pendente)
+
+## 📝 Status
+
+✅ Estrutura base configurada  
+✅ Navegação por tabs funcionando  
+✅ Telas principais criadas  
+🔄 Componentes UI em desenvolvimento  
+🔄 Integração Firebase pendente  
+
+## 🎯 Próximos Passos
+
+1. Implementar componentes UI nativos
+2. Conectar com Firebase
+3. Adicionar autenticação
+4. Implementar funcionalidades completas
+
+---
+
+**Nota**: A pasta `src/` contém código legado do Next.js e pode ser ignorada ou removida.
