@@ -1,21 +1,35 @@
 import { View, StyleSheet, useWindowDimensions } from 'react-native';
-import { Tabs } from 'expo-router';
+import { Tabs, useSegments } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { AppHeader } from '../components/AppHeader';
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
+import { useEffect, useState } from 'react';
 
 export default function TabLayout() {
   const insets = useSafeAreaInsets();
+  const segments = useSegments();
+  const [isSparksPage, setIsSparksPage] = useState(false);
+
+  useEffect(() => {
+    // Verifica se está na página sparks
+    const path = segments.join('/');
+    setIsSparksPage(path.includes('sparks'));
+  }, [segments]);
 
   return (
     <View style={styles.container}>
-      {/* Retângulo branco acima do header */}
-      <View style={[styles.topBar, { height: insets.top }]} />
-      <AppHeader />
-      <Tabs 
+      {/* Retângulo branco acima do header - escondido na página sparks */}
+      {!isSparksPage && (
+        <>
+          <View style={[styles.topBar, { height: insets.top }]} />
+          <AppHeader />
+        </>
+      )}
+      <Tabs
         screenOptions={{ 
           tabBarActiveTintColor: '#007AFF',
           headerShown: false,
+          tabBarStyle: isSparksPage ? { display: 'none' } : undefined,
         }}
       >
         <Tabs.Screen
@@ -33,6 +47,33 @@ export default function TabLayout() {
             title: 'Comunidades',
             tabBarIcon: ({ color, size }) => (
               <Ionicons name="people" size={size} color={color} />
+            ),
+          }}
+        />
+        <Tabs.Screen
+          name="services"
+          options={{
+            title: 'Serviços',
+            tabBarIcon: ({ color, size }) => (
+              <Ionicons name="briefcase" size={size} color={color} />
+            ),
+          }}
+        />
+        <Tabs.Screen
+          name="sparks"
+          options={{
+            title: 'Sparks',
+            tabBarIcon: ({ color, size }) => (
+              <Ionicons name="flash" size={size} color={color} />
+            ),
+          }}
+        />
+        <Tabs.Screen
+          name="ranking"
+          options={{
+            title: 'Ranking',
+            tabBarIcon: ({ color, size }) => (
+              <Ionicons name="trophy" size={size} color={color} />
             ),
           }}
         />

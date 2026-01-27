@@ -14,7 +14,8 @@ import {
   serverTimestamp,
   orderBy,
   limit,
-  collection
+  collection,
+  Timestamp
 } from 'firebase/firestore';
 import { db } from './firebaseconfig';
 
@@ -441,5 +442,116 @@ export async function savePost(postId: string, userId: string): Promise<boolean>
   } catch (error) {
     console.error('Error saving post:', error);
     throw error;
+  }
+}
+
+/**
+ * Busca todos os posts curtidos por um usuário
+ */
+export async function getUserLikedPosts(userId: string): Promise<string[]> {
+  if (!db) {
+    console.error('Firebase db não está inicializado');
+    return [];
+  }
+  
+  try {
+    // Busca em todos os posts que têm likes
+    const postsRef = collection(db, 'posts');
+    const postsSnapshot = await getDocs(postsRef);
+    const likedPostIds: string[] = [];
+    
+    for (const postDoc of postsSnapshot.docs) {
+      const postId = postDoc.id;
+      const likesRef = collection(postDoc.ref, 'likes');
+      const likeDoc = await getDoc(doc(likesRef, userId));
+      
+      if (likeDoc.exists()) {
+        likedPostIds.push(postId);
+      }
+    }
+    
+    return likedPostIds;
+  } catch (error) {
+    console.error('Error fetching liked posts:', error);
+    return [];
+  }
+}
+
+/**
+ * Busca todos os posts repostados por um usuário
+ */
+export async function getUserRepostedPosts(userId: string): Promise<string[]> {
+  if (!db) {
+    console.error('Firebase db não está inicializado');
+    return [];
+  }
+  
+  try {
+    const postsRef = collection(db, 'posts');
+    const postsSnapshot = await getDocs(postsRef);
+    const repostedPostIds: string[] = [];
+    
+    for (const postDoc of postsSnapshot.docs) {
+      const postId = postDoc.id;
+      const repostsRef = collection(postDoc.ref, 'reposts');
+      const repostDoc = await getDoc(doc(repostsRef, userId));
+      
+      if (repostDoc.exists()) {
+        repostedPostIds.push(postId);
+      }
+    }
+    
+    return repostedPostIds;
+  } catch (error) {
+    console.error('Error fetching reposted posts:', error);
+    return [];
+  }
+}
+
+/**
+ * Busca todos os posts salvos por um usuário
+ */
+export async function getUserSavedPosts(userId: string): Promise<string[]> {
+  if (!db) {
+    console.error('Firebase db não está inicializado');
+    return [];
+  }
+  
+  try {
+    const userRef = doc(db, 'users', userId);
+    const savedPostsRef = collection(userRef, 'savedPosts');
+    const savedPostsSnapshot = await getDocs(savedPostsRef);
+    
+    return savedPostsSnapshot.docs.map(doc => doc.data().postId);
+  } catch (error) {
+    console.error('Error fetching saved posts:', error);
+    return [];
+  }
+}
+
+/**
+ * Busca informações completas de um post pelo ID
+ */
+export async function getPostById(postId: string): Promise<any | null> {
+  if (!db) {
+    console.error('Firebase db não está inicializado');
+    return null;
+  }
+  
+  try {
+    const postRef = doc(db, 'posts', postId);
+    const postDoc = await getDoc(postRef);
+    
+    if (!postDoc.exists()) {
+      return null;
+    }
+    
+    return {
+      id: postDoc.id,
+      ...postDoc.data()
+    };
+  } catch (error) {
+    console.error('Error fetching post:', error);
+    return null;
   }
 }

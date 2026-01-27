@@ -157,7 +157,15 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       }
     } catch (err: any) {
       console.error('Error loading user from Firestore:', err);
-      setError(err.message || 'Erro ao carregar dados do usuário');
+      
+      // Mensagem mais específica para erros de permissão
+      if (err.code === 'permission-denied' || err.message?.includes('permissions')) {
+        const errorMsg = 'Erro de permissão: Verifique as regras do Firestore. Veja FIREBASE_FIRESTORE_RULES.md';
+        console.error('❌', errorMsg);
+        setError(errorMsg);
+      } else {
+        setError(err.message || 'Erro ao carregar dados do usuário');
+      }
     }
   };
 
