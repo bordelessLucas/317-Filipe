@@ -20,9 +20,19 @@ interface Post {
   timeAgo: string;
   text: string;
   imageUrl?: string;
+  videoUrl?: string;
   likes: number;
   comments: number;
   shares: number;
+  type?: 'default' | 'photo' | 'video' | 'poll' | 'live' | 'spark';
+  poll?: {
+    question: string;
+    options: Array<{ id: string; text: string; votes: number }>;
+    allowMultiple: boolean;
+    userVotes?: string[];
+  };
+  isLive?: boolean;
+  viewers?: number;
 }
 
 interface PostCardProps {
@@ -245,8 +255,45 @@ export function PostCard({ post }: PostCardProps) {
         <Text style={styles.postText}>{post.text}</Text>
       )}
 
+      {/* Live Indicator */}
+      {post.isLive && (
+        <View style={styles.liveBadge}>
+          <View style={styles.liveDot} />
+          <Text style={styles.liveText}>AO VIVO</Text>
+          {post.viewers && (
+            <Text style={styles.viewersText}>{post.viewers.toLocaleString()} assistindo</Text>
+          )}
+        </View>
+      )}
+
+      {/* Poll */}
+      {post.type === 'poll' && post.poll && (
+        <View style={styles.pollContainer}>
+          <Text style={styles.pollQuestion}>{post.poll.question}</Text>
+          {post.poll.options.map((option) => {
+            const totalVotes = post.poll!.options.reduce((sum, opt) => sum + opt.votes, 0);
+            const percentage = totalVotes > 0 ? (option.votes / totalVotes) * 100 : 0;
+            const isVoted = post.poll!.userVotes?.includes(option.id);
+            
+            return (
+              <TouchableOpacity
+                key={option.id}
+                style={[styles.pollOption, isVoted && styles.pollOptionVoted]}
+                activeOpacity={0.7}
+              >
+                <View style={styles.pollOptionContent}>
+                  <Text style={styles.pollOptionText}>{option.text}</Text>
+                  <Text style={styles.pollPercentage}>{percentage.toFixed(0)}%</Text>
+                </View>
+                <View style={[styles.pollBar, { width: `${percentage}%` }]} />
+              </TouchableOpacity>
+            );
+          })}
+        </View>
+      )}
+
       {/* Imagem do Post */}
-      {post.imageUrl && !imageError && (
+      {post.imageUrl && !imageError && post.type !== 'spark' && (
         <View style={styles.imageContainer}>
           <Image 
             source={{ uri: post.imageUrl }} 
@@ -254,6 +301,26 @@ export function PostCard({ post }: PostCardProps) {
             resizeMode="cover"
             onError={() => setImageError(true)}
           />
+        </View>
+      )}
+
+      {/* Video do Post */}
+      {post.videoUrl && post.type !== 'spark' && (
+        <View style={styles.videoContainer}>
+          <View style={styles.videoPlaceholder}>
+            <Ionicons name="play-circle" size={48} color="#fff" />
+            <Text style={styles.videoLabel}>Vídeo</Text>
+          </View>
+        </View>
+      )}
+
+      {/* Spark Video (vertical format) */}
+      {post.type === 'spark' && post.videoUrl && (
+        <View style={styles.sparkContainer}>
+          <View style={styles.sparkVideoPlaceholder}>
+            <Ionicons name="play-circle" size={64} color="#fff" />
+            <Text style={styles.sparkLabel}>Spark</Text>
+          </View>
         </View>
       )}
 
@@ -506,6 +573,118 @@ const styles = StyleSheet.create({
     width: '100%',
     height: width * 0.6,
     backgroundColor: '#f0f0f0',
+  },
+  liveBadge: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#FF3B30',
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    marginHorizontal: 10,
+    marginBottom: 8,
+    borderRadius: 20,
+    gap: 6,
+    alignSelf: 'flex-start',
+  },
+  liveDot: {
+    width: 8,
+    height: 8,
+    borderRadius: 4,
+    backgroundColor: '#fff',
+  },
+  liveText: {
+    color: '#fff',
+    fontSize: 12,
+    fontWeight: '700',
+  },
+  viewersText: {
+    color: '#fff',
+    fontSize: 11,
+    opacity: 0.9,
+  },
+  pollContainer: {
+    marginHorizontal: 10,
+    marginBottom: 8,
+    padding: 12,
+    backgroundColor: '#f9f9f9',
+    borderRadius: 12,
+  },
+  pollQuestion: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: '#333',
+    marginBottom: 12,
+  },
+  pollOption: {
+    marginBottom: 8,
+    borderRadius: 8,
+    overflow: 'hidden',
+    borderWidth: 1,
+    borderColor: '#e0e0e0',
+    position: 'relative',
+  },
+  pollOptionVoted: {
+    borderColor: '#007AFF',
+    borderWidth: 2,
+  },
+  pollOptionContent: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    padding: 12,
+    zIndex: 1,
+  },
+  pollOptionText: {
+    fontSize: 14,
+    color: '#333',
+    flex: 1,
+  },
+  pollPercentage: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: '#007AFF',
+  },
+  pollBar: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    bottom: 0,
+    backgroundColor: '#E3F2FD',
+    zIndex: 0,
+  },
+  videoContainer: {
+    width: width,
+    marginBottom: 8,
+  },
+  videoPlaceholder: {
+    width: '100%',
+    height: width * 0.6,
+    backgroundColor: '#000',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  videoLabel: {
+    color: '#fff',
+    marginTop: 8,
+    fontSize: 14,
+  },
+  sparkContainer: {
+    width: width,
+    marginBottom: 8,
+    alignItems: 'center',
+  },
+  sparkVideoPlaceholder: {
+    width: width * 0.6,
+    height: width * 1.07, // 9:16 aspect ratio
+    backgroundColor: '#000',
+    justifyContent: 'center',
+    alignItems: 'center',
+    borderRadius: 12,
+  },
+  sparkLabel: {
+    color: '#fff',
+    marginTop: 8,
+    fontSize: 14,
   },
   divider: {
     height: 1,

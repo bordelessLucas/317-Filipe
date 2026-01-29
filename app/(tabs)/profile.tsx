@@ -31,7 +31,7 @@ import {
 
 const { width } = Dimensions.get('window');
 
-type TabType = 'posts' | 'liked' | 'reposted' | 'saved';
+type TabType = 'posts' | 'liked' | 'reposted' | 'saved' | 'sparks';
 
 interface Post {
   id: string;
@@ -65,6 +65,7 @@ export default function ProfileScreen() {
   const [likedPosts, setLikedPosts] = useState<Post[]>([]);
   const [repostedPosts, setRepostedPosts] = useState<Post[]>([]);
   const [savedPosts, setSavedPosts] = useState<Post[]>([]);
+  const [sparks, setSparks] = useState<Post[]>([]);
   const [isLoadingPosts, setIsLoadingPosts] = useState(false);
 
   // Mock posts do usuário (substituir por busca real no Firebase)
@@ -142,6 +143,21 @@ export default function ProfileScreen() {
           .filter(p => p !== null)
           .map(p => formatPostFromFirebase(p));
         setSavedPosts(formattedPosts);
+      } else if (activeTab === 'sparks') {
+        // Sparks do usuário (mock)
+        setSparks([
+          {
+            id: 'spark-1',
+            userName: user?.name || 'Usuário',
+            userAvatar: user?.photoURL,
+            timeAgo: '2h',
+            text: 'Meu primeiro Spark! 🎬✨',
+            imageUrl: 'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=800&q=80',
+            likes: 45,
+            comments: 8,
+            shares: 3,
+          },
+        ]);
       } else {
         // Posts do usuário (mock por enquanto)
         setPosts(mockUserPosts);
@@ -320,6 +336,8 @@ export default function ProfileScreen() {
         return repostedPosts;
       case 'saved':
         return savedPosts;
+      case 'sparks':
+        return sparks;
       default:
         return posts;
     }
@@ -670,6 +688,19 @@ export default function ProfileScreen() {
               Salvos
             </Text>
           </TouchableOpacity>
+          <TouchableOpacity
+            style={[styles.tab, activeTab === 'sparks' && styles.tabActive]}
+            onPress={() => setActiveTab('sparks')}
+          >
+            <Ionicons 
+              name="flash-outline" 
+              size={20} 
+              color={activeTab === 'sparks' ? '#FF6B00' : '#666'} 
+            />
+            <Text style={[styles.tabText, activeTab === 'sparks' && styles.tabTextActive]}>
+              Sparks
+            </Text>
+          </TouchableOpacity>
         </View>
 
         {/* Lista de Posts */}
@@ -699,13 +730,15 @@ export default function ProfileScreen() {
                 {activeTab === 'posts' ? 'Nenhum post ainda' :
                  activeTab === 'liked' ? 'Nenhum post curtido' :
                  activeTab === 'reposted' ? 'Nenhum post repostado' :
-                 'Nenhum post salvo'}
+                 activeTab === 'saved' ? 'Nenhum post salvo' :
+                 'Nenhum Spark ainda'}
               </Text>
               <Text style={styles.emptyStateText}>
                 {activeTab === 'posts' ? 'Comece a compartilhar suas ideias!' :
                  activeTab === 'liked' ? 'Posts que você curtiu aparecerão aqui' :
                  activeTab === 'reposted' ? 'Posts que você repostou aparecerão aqui' :
-                 'Posts que você salvou aparecerão aqui'}
+                 activeTab === 'saved' ? 'Posts que você salvou aparecerão aqui' :
+                 'Crie seu primeiro Spark!'}
               </Text>
             </View>
           )}

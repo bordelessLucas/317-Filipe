@@ -1,20 +1,72 @@
 import { useState } from 'react';
-import { View, Text, TextInput, StyleSheet, TouchableOpacity, Modal } from 'react-native';
+import { View, Text, TextInput, StyleSheet, TouchableOpacity, Modal, Alert } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import { CreatePhotoVideoPost } from './CreatePhotoVideoPost';
+import { CreatePollPost } from './CreatePollPost';
+import { CreateLiveStream } from './CreateLiveStream';
+import { CreateSpark } from './CreateSpark';
 
 export function CreatePost() {
   const [postText, setPostText] = useState('');
   const [showOptions, setShowOptions] = useState(false);
+  const [showPhotoVideo, setShowPhotoVideo] = useState(false);
+  const [showPoll, setShowPoll] = useState(false);
+  const [showLive, setShowLive] = useState(false);
+  const [showSpark, setShowSpark] = useState(false);
+  const [mediaType, setMediaType] = useState<'photo' | 'video'>('photo');
 
   const postOptions = [
     { id: 'photo', label: 'Foto', icon: 'image-outline', color: '#4CAF50' },
     { id: 'video', label: 'Vídeo', icon: 'videocam-outline', color: '#FF9800' },
-    { id: 'music', label: 'Música', icon: 'musical-notes-outline', color: '#9C27B0' },
-    { id: 'achievement', label: 'Conquista', icon: 'trophy-outline', color: '#FFD700' },
     { id: 'poll', label: 'Enquete', icon: 'bar-chart-outline', color: '#2196F3' },
     { id: 'live', label: 'Ao Vivo', icon: 'radio-outline', color: '#FF3B30' },
     { id: 'spark', label: 'Spark', icon: 'flash-outline', color: '#FF6B00' },
   ];
+
+  const handleOptionSelect = (optionId: string) => {
+    switch (optionId) {
+      case 'photo':
+        setMediaType('photo');
+        setShowPhotoVideo(true);
+        break;
+      case 'video':
+        setMediaType('video');
+        setShowPhotoVideo(true);
+        break;
+      case 'poll':
+        setShowPoll(true);
+        break;
+      case 'live':
+        setShowLive(true);
+        break;
+      case 'spark':
+        setShowSpark(true);
+        break;
+    }
+  };
+
+  const handlePhotoVideoPost = (post: { text: string; mediaUri: string; mediaType: 'photo' | 'video' }) => {
+    // Mock: adicionar ao feed
+    console.log('Post de foto/vídeo:', post);
+    Alert.alert('Sucesso!', 'Post publicado no feed!');
+  };
+
+  const handlePollPost = (post: { text: string; question: string; options: any[]; allowMultiple: boolean }) => {
+    // Mock: adicionar ao feed
+    console.log('Post de enquete:', post);
+    Alert.alert('Sucesso!', 'Enquete publicada no feed!');
+  };
+
+  const handleLiveStart = (stream: { title: string; description: string }) => {
+    // Mock: iniciar transmissão
+    console.log('Iniciando transmissão:', stream);
+  };
+
+  const handleSparkPost = (spark: { title: string; videoUri: string; thumbnailUri?: string }) => {
+    // Mock: adicionar Spark
+    console.log('Spark publicado:', spark);
+    Alert.alert('Sucesso!', 'Spark publicado!');
+  };
 
   return (
     <View style={styles.container}>
@@ -67,8 +119,8 @@ export function CreatePost() {
                 key={option.id}
                 style={styles.optionItem}
                 onPress={() => {
-                  console.log('Selecionado:', option.label);
                   setShowOptions(false);
+                  handleOptionSelect(option.id);
                 }}
               >
                 <Ionicons name={option.icon as any} size={24} color={option.color} />
@@ -78,6 +130,28 @@ export function CreatePost() {
           </View>
         </TouchableOpacity>
       </Modal>
+
+      {/* Modals for different post types */}
+      <CreatePhotoVideoPost
+        visible={showPhotoVideo}
+        onClose={() => setShowPhotoVideo(false)}
+        onPost={handlePhotoVideoPost}
+      />
+      <CreatePollPost
+        visible={showPoll}
+        onClose={() => setShowPoll(false)}
+        onPost={handlePollPost}
+      />
+      <CreateLiveStream
+        visible={showLive}
+        onClose={() => setShowLive(false)}
+        onStart={handleLiveStart}
+      />
+      <CreateSpark
+        visible={showSpark}
+        onClose={() => setShowSpark(false)}
+        onPost={handleSparkPost}
+      />
     </View>
   );
 }
